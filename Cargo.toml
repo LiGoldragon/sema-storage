@@ -1,0 +1,24 @@
+[package]
+name="sema-storage"
+version="0.1.0"
+edition="2024"
+rust-version="1.89"
+license="MIT OR Apache-2.0"
+repository="https://github.com/LiGoldragon/sema-storage"
+description="Central durable Sema daemon for the minimal language engine"
+[lib]
+name="sema_storage"
+[[bin]]
+name="sema-storage"
+path="src/bin/sema-storage.rs"
+[dependencies]
+kameo={git="https://github.com/LiGoldragon/kameo.git",rev="f491b45d7dcb55e5837eddde3d5d7ca8ceaa9f01",default-features=false,features=["macros"]}
+rkyv={version="0.8",features=["bytecheck"]}
+sema-engine={git="https://github.com/LiGoldragon/sema-engine.git",rev="c56c905d2cec24b9b41a62ed7b8bc847b33be533"}
+signal-sema-storage={git="https://github.com/LiGoldragon/signal-sema-storage.git",rev="a86cb480ff9505b0c068fc0152de352be99d0ef2"}
+tokio={version="1",features=["macros","rt-multi-thread","net","io-util","sync"]}
+thiserror="2"
+[dev-dependencies]
+tempfile="3"
+[lints.rust]
+unsafe_code="forbid"
