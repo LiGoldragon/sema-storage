@@ -13,10 +13,11 @@ name="sema-storage"
 path="src/bin/sema-storage.rs"
 [dependencies]
 kameo={git="https://github.com/LiGoldragon/kameo.git",rev="f491b45d7dcb55e5837eddde3d5d7ca8ceaa9f01",default-features=false,features=["macros"]}
+name-table={git="https://github.com/LiGoldragon/name-table.git",rev="c3237f77c087e6feab49d6cf34971cebc14a11e6"}
 rkyv={version="0.8",features=["bytecheck"]}
-sema-engine={git="https://github.com/LiGoldragon/sema-engine.git",rev="c56c905d2cec24b9b41a62ed7b8bc847b33be533"}
-signal-sema-storage={git="https://github.com/LiGoldragon/signal-sema-storage.git",rev="a86cb480ff9505b0c068fc0152de352be99d0ef2"}
-tokio={version="1",features=["macros","rt-multi-thread","net","io-util","sync"]}
+sema-engine={git="https://github.com/LiGoldragon/sema-engine.git",rev="8338bca0d7ea2717e02efa23ff4a77bb791075ec"}
+signal-sema-storage={git="https://github.com/LiGoldragon/signal-sema-storage.git",rev="1bd593f4040307bd4d1db76ee15aa67d00efe1e6"}
+tokio={version="1",features=["macros","rt-multi-thread","net","io-util","sync","time"]}
 thiserror="2"
 [dev-dependencies]
 tempfile="3"

@@ -104,33 +104,9 @@ dependencies = [
 [[package]]
 name = "core-logos"
 version = "0.1.0"
-source = "git+https://github.com/LiGoldragon/core-logos.git?rev=17cbd7596df2#17cbd7596df203e0717fe079b7688cc60ec05e4b"
-dependencies = [
- "content-identity",
- "name-table",
- "rkyv",
- "thiserror",
-]
-
-[[package]]
-name = "core-logos"
-version = "0.1.0"
 source = "git+https://github.com/LiGoldragon/core-logos.git?rev=17cbd7596df203e0717fe079b7688cc60ec05e4b#17cbd7596df203e0717fe079b7688cc60ec05e4b"
 dependencies = [
  "content-identity",
- "name-table",
- "rkyv",
- "thiserror",
-]
-
-[[package]]
-name = "core-nomos"
-version = "0.1.0"
-source = "git+https://github.com/LiGoldragon/core-nomos.git?rev=88a1ecf552727b2037263423da8a4af0e65619e1#88a1ecf552727b2037263423da8a4af0e65619e1"
-dependencies = [
- "content-identity",
- "core-logos 0.1.0 (git+https://github.com/LiGoldragon/core-logos.git?rev=17cbd7596df2)",
- "core-schema",
  "name-table",
  "rkyv",
  "thiserror",
@@ -563,7 +539,7 @@ checksum = "cf54715a573b99ac80df0bc206da022bcd442c974952c7b9720069370852e21f"
 [[package]]
 name = "sema"
 version = "0.1.1"
-source = "git+https://github.com/LiGoldragon/sema.git?branch=main#51d7927c872f0df12791bad8d39a4db6433b01a1"
+source = "git+https://github.com/LiGoldragon/sema.git?rev=51d7927c872f0df12791bad8d39a4db6433b01a1#51d7927c872f0df12791bad8d39a4db6433b01a1"
 dependencies = [
  "redb",
  "rkyv",
@@ -573,7 +549,7 @@ dependencies = [
 [[package]]
 name = "sema-engine"
 version = "0.10.1"
-source = "git+https://github.com/LiGoldragon/sema-engine.git?rev=c56c905d2cec24b9b41a62ed7b8bc847b33be533#c56c905d2cec24b9b41a62ed7b8bc847b33be533"
+source = "git+https://github.com/LiGoldragon/sema-engine.git?rev=8338bca0d7ea2717e02efa23ff4a77bb791075ec#8338bca0d7ea2717e02efa23ff4a77bb791075ec"
 dependencies = [
  "blake3",
  "rkyv",
@@ -588,6 +564,7 @@ name = "sema-storage"
 version = "0.1.0"
 dependencies = [
  "kameo",
+ "name-table",
  "rkyv",
  "sema-engine",
  "signal-sema-storage",
@@ -635,7 +612,7 @@ checksum = "f8fadd59c855ef2080decdef8ff161eb6661b86933c9d82e5ba29dc602a55aba"
 [[package]]
 name = "signal-frame"
 version = "0.3.0"
-source = "git+https://github.com/LiGoldragon/signal-frame.git?branch=main#fd7909d1497b7bb18751521387a1087cd9e7c91c"
+source = "git+https://github.com/LiGoldragon/signal-frame.git?rev=d202e20d2171084e1425696e452686862945f7fb#d202e20d2171084e1425696e452686862945f7fb"
 dependencies = [
  "paste",
  "rkyv",
@@ -646,7 +623,7 @@ dependencies = [
 [[package]]
 name = "signal-frame-macros"
 version = "0.1.1"
-source = "git+https://github.com/LiGoldragon/signal-frame.git?branch=main#fd7909d1497b7bb18751521387a1087cd9e7c91c"
+source = "git+https://github.com/LiGoldragon/signal-frame.git?rev=d202e20d2171084e1425696e452686862945f7fb#d202e20d2171084e1425696e452686862945f7fb"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -656,7 +633,7 @@ dependencies = [
 [[package]]
 name = "signal-sema"
 version = "0.2.0"
-source = "git+https://github.com/LiGoldragon/signal-sema.git?branch=main#8d4a0223efe59b36ac79d154d15961084eef286b"
+source = "git+https://github.com/LiGoldragon/signal-sema.git?rev=924832cdb529db3348dd93e09457a385fd57efd8#924832cdb529db3348dd93e09457a385fd57efd8"
 dependencies = [
  "rkyv",
  "thiserror",
@@ -665,11 +642,10 @@ dependencies = [
 [[package]]
 name = "signal-sema-storage"
 version = "0.1.0"
-source = "git+https://github.com/LiGoldragon/signal-sema-storage.git?rev=a86cb480ff9505b0c068fc0152de352be99d0ef2#a86cb480ff9505b0c068fc0152de352be99d0ef2"
+source = "git+https://github.com/LiGoldragon/signal-sema-storage.git?rev=1bd593f4040307bd4d1db76ee15aa67d00efe1e6#1bd593f4040307bd4d1db76ee15aa67d00efe1e6"
 dependencies = [
  "blake3",
- "core-logos 0.1.0 (git+https://github.com/LiGoldragon/core-logos.git?rev=17cbd7596df203e0717fe079b7688cc60ec05e4b)",
- "core-nomos",
+ "core-logos",
  "core-schema",
  "name-table",
  "rkyv",

@@ -1,6 +1,210 @@
-use std::{env,path::PathBuf};
-use tokio::{io::{AsyncReadExt,AsyncWriteExt},net::{UnixListener,UnixStream}};
-use sema_storage::Runtime;use signal_sema_storage::{Reply,Request,Wire};
-#[tokio::main] async fn main()->Result<(),Box<dyn std::error::Error>>{let mut args=env::args().skip(1);let command=args.next().unwrap_or_else(||"daemon".into());let socket=PathBuf::from(args.next().unwrap_or_else(||"/tmp/new-language-engine/sema.sock".into()));let database=PathBuf::from(args.next().unwrap_or_else(||"/tmp/new-language-engine/state.sema".into()));if command=="daemon"{if let Some(parent)=socket.parent(){std::fs::create_dir_all(parent)?}let _=std::fs::remove_file(&socket);let listener=UnixListener::bind(&socket)?;let runtime=Runtime::open(&database).await?;loop{let(stream,_)=listener.accept().await?;let runtime=runtime.clone();tokio::spawn(async move{let _=serve(stream,runtime).await;});}}else{Err("usage: sema-storage daemon [socket] [database]".into())}}
-async fn serve(mut stream:UnixStream,runtime:Runtime)->Result<(),Box<dyn std::error::Error>>{let length=stream.read_u32_le().await? as usize;if length>16*1024*1024{return Err("frame too large".into())}let mut bytes=vec![0;length];stream.read_exact(&mut bytes).await?;let request=rkyv::from_bytes::<Request,rkyv::rancor::Error>(&bytes)?;let subscribed=matches!(request,Request::Subscribe{..});let mut events=runtime.subscribe();let reply=runtime.request(request).await?;write_reply(&mut stream,&reply).await?;if subscribed{while let Ok(event)=events.recv().await{write_reply(&mut stream,&Reply::Event(event)).await?;}}Ok(())}
-async fn write_reply(stream:&mut UnixStream,reply:&Reply)->Result<(),Box<dyn std::error::Error>>{let bytes=Wire::encode_reply(reply)?;stream.write_u32_le(bytes.len() as u32).await?;stream.write_all(&bytes).await?;Ok(())}
+use std::{env, path::PathBuf};
+
+use sema_storage::Runtime;
+use signal_sema_storage::{
+    DocumentKey, DocumentKind, DocumentPayload, FamilyDeclaration, FixtureScope, NameTableBytes,
+    Reply, Request, SemaStorageRoot, SlotIdentifier, Version, Wire,
+};
+use tokio::{
+    io::{AsyncReadExt, AsyncWriteExt},
+    net::{UnixListener, UnixStream},
+};
+
+#[tokio::main]
+async fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let mut arguments = env::args().skip(1);
+    let command = arguments.next().unwrap_or_else(|| "help".into());
+    if command == "daemon" {
+        let socket = PathBuf::from(
+            arguments
+                .next()
+                .unwrap_or_else(|| "/tmp/new-language-engine/sema.sock".into()),
+        );
+        let database = PathBuf::from(
+            arguments
+                .next()
+                .unwrap_or_else(|| "/tmp/new-language-engine/state.sema".into()),
+        );
+        if let Some(parent) = socket.parent() {
+            std::fs::create_dir_all(parent)?;
+        }
+        let _ = std::fs::remove_file(&socket);
+        let listener = UnixListener::bind(&socket)?;
+        let runtime = Runtime::open(&database).await?;
+        loop {
+            let (stream, _) = listener.accept().await?;
+            let runtime = runtime.clone();
+            tokio::spawn(async move {
+                let _ = serve(stream, runtime).await;
+            });
+        }
+    }
+
+    let socket = PathBuf::from(arguments.next().ok_or("missing socket path")?);
+    let request = match command.as_str() {
+        "list" => Request::List {
+            scope: FixtureScope(parse(&mut arguments, "scope")?),
+            kind: arguments.next().map(|kind| parse_kind(&kind)).transpose()?,
+        },
+        "fetch" => Request::Fetch {
+            key: DocumentKey {
+                scope: FixtureScope(parse(&mut arguments, "scope")?),
+                kind: parse_kind(&arguments.next().ok_or("kind")?)?,
+                slot: SlotIdentifier(parse(&mut arguments, "slot")?),
+            },
+            version: arguments
+                .next()
+                .map(|value| value.parse().map(Version))
+                .transpose()?,
+        },
+        "hash-fetch" => Request::HashFetch {
+            hash: signal_sema_storage::ContentHash(parse_hash(
+                &arguments.next().ok_or("hash")?,
+            )?),
+        },
+        "snapshot" => Request::Snapshot {
+            scope: FixtureScope(parse(&mut arguments, "scope")?),
+        },
+        "allocate" => Request::AllocateIdentifiers {
+            scope: FixtureScope(parse(&mut arguments, "scope")?),
+            count: parse(&mut arguments, "count")?,
+        },
+        "store-sema-family" => {
+            let scope = FixtureScope(parse(&mut arguments, "scope")?);
+            let slot = SlotIdentifier(parse(&mut arguments, "slot")?);
+            let family = name_table::Identifier::new(parse(&mut arguments, "family id")?);
+            let layout_version = parse(&mut arguments, "layout version")?;
+            Request::Store {
+                key: DocumentKey {
+                    scope,
+                    kind: DocumentKind::SemaStorage,
+                    slot,
+                },
+                payload: DocumentPayload::SemaStorage(SemaStorageRoot {
+                    families: vec![FamilyDeclaration {
+                        family,
+                        layout_version,
+                    }],
+                    names: NameTableBytes(Vec::new()),
+                }),
+            }
+        }
+        "subscribe" => {
+            let request = Request::Subscribe {
+                scope: FixtureScope(parse(&mut arguments, "scope")?),
+                kind: arguments.next().map(|kind| parse_kind(&kind)).transpose()?,
+            };
+            return subscribe(&socket, request).await;
+        }
+        _ => return Err("usage: sema-storage daemon [socket] [database] | list|fetch|hash-fetch|snapshot|allocate|store-sema-family|subscribe <socket> ...".into()),
+    };
+    println!("{:?}", exchange(&socket, &request).await?);
+    Ok(())
+}
+
+fn parse<T: std::str::FromStr>(
+    arguments: &mut impl Iterator<Item = String>,
+    name: &str,
+) -> Result<T, Box<dyn std::error::Error>>
+where
+    T::Err: std::error::Error + 'static,
+{
+    Ok(arguments
+        .next()
+        .ok_or_else(|| format!("missing {name}"))?
+        .parse()?)
+}
+
+fn parse_kind(value: &str) -> Result<DocumentKind, Box<dyn std::error::Error>> {
+    Ok(match value {
+        "type-schema" => DocumentKind::TypeSchema,
+        "signal-contract" => DocumentKind::SignalContract,
+        "nexus-runtime" => DocumentKind::NexusRuntime,
+        "sema-storage" => DocumentKind::SemaStorage,
+        "nomos" => DocumentKind::Nomos,
+        "logos" => DocumentKind::Logos,
+        _ => return Err(format!("unknown document kind: {value}").into()),
+    })
+}
+
+fn parse_hash(value: &str) -> Result<[u8; 32], Box<dyn std::error::Error>> {
+    if value.len() != 64 {
+        return Err("hash must contain 64 hexadecimal digits".into());
+    }
+    let mut output = [0; 32];
+    for (index, pair) in value.as_bytes().chunks_exact(2).enumerate() {
+        output[index] = u8::from_str_radix(std::str::from_utf8(pair)?, 16)?;
+    }
+    Ok(output)
+}
+
+async fn exchange(
+    socket: &PathBuf,
+    request: &Request,
+) -> Result<Reply, Box<dyn std::error::Error>> {
+    let mut stream = UnixStream::connect(socket).await?;
+    write_request(&mut stream, request).await?;
+    read_reply(&mut stream).await
+}
+
+async fn subscribe(socket: &PathBuf, request: Request) -> Result<(), Box<dyn std::error::Error>> {
+    let mut stream = UnixStream::connect(socket).await?;
+    write_request(&mut stream, &request).await?;
+    loop {
+        println!("{:?}", read_reply(&mut stream).await?);
+    }
+}
+
+async fn write_request(
+    stream: &mut UnixStream,
+    request: &Request,
+) -> Result<(), Box<dyn std::error::Error>> {
+    let bytes = Wire::encode_request(request)?;
+    stream.write_u32_le(bytes.len() as u32).await?;
+    stream.write_all(&bytes).await?;
+    Ok(())
+}
+
+async fn read_reply(stream: &mut UnixStream) -> Result<Reply, Box<dyn std::error::Error>> {
+    let length = stream.read_u32_le().await? as usize;
+    let mut bytes = vec![0; length];
+    stream.read_exact(&mut bytes).await?;
+    Ok(rkyv::from_bytes::<Reply, rkyv::rancor::Error>(&bytes)?)
+}
+
+async fn serve(mut stream: UnixStream, runtime: Runtime) -> Result<(), Box<dyn std::error::Error>> {
+    let length = stream.read_u32_le().await? as usize;
+    if length > 16 * 1024 * 1024 {
+        return Err("frame too large".into());
+    }
+    let mut bytes = vec![0; length];
+    stream.read_exact(&mut bytes).await?;
+    let request = rkyv::from_bytes::<Request, rkyv::rancor::Error>(&bytes)?;
+    let subscription_filter = match &request {
+        Request::Subscribe { scope, kind } => Some((*scope, *kind)),
+        _ => None,
+    };
+    let mut events = runtime.subscribe();
+    let reply = runtime.request(request).await?;
+    write_reply(&mut stream, &reply).await?;
+    if let Some((scope, kind)) = subscription_filter {
+        while let Ok(event) = events.recv().await {
+            if event.document.key.scope == scope
+                && kind.is_none_or(|expected| event.document.key.kind == expected)
+            {
+                write_reply(&mut stream, &Reply::Event(event)).await?;
+            }
+        }
+    }
+    Ok(())
+}
+
+async fn write_reply(
+    stream: &mut UnixStream,
+    reply: &Reply,
+) -> Result<(), Box<dyn std::error::Error>> {
+    let bytes = Wire::encode_reply(reply)?;
+    stream.write_u32_le(bytes.len() as u32).await?;
+    stream.write_all(&bytes).await?;
+    Ok(())
+}
