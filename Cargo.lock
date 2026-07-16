@@ -642,7 +642,7 @@ dependencies = [
 [[package]]
 name = "signal-sema-storage"
 version = "0.1.0"
-source = "git+https://github.com/LiGoldragon/signal-sema-storage.git?rev=17d90e2a08cd926b4e4096cb48386542036e25a7#17d90e2a08cd926b4e4096cb48386542036e25a7"
+source = "git+https://github.com/LiGoldragon/signal-sema-storage.git?rev=bd6cd6c4f2f020ad04427fc8ca86ca22d9cf4e6c#bd6cd6c4f2f020ad04427fc8ca86ca22d9cf4e6c"
 dependencies = [
  "content-identity",
  "core-logos",

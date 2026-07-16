@@ -16,7 +16,7 @@ kameo={git="https://github.com/LiGoldragon/kameo.git",rev="f491b45d7dcb55e5837ed
 name-table={git="https://github.com/LiGoldragon/name-table.git",rev="c3237f77c087e6feab49d6cf34971cebc14a11e6"}
 rkyv={version="0.8",features=["bytecheck"]}
 sema-engine={git="https://github.com/LiGoldragon/sema-engine.git",rev="93a6b5f063292e000a7bf395fdd5b46e3e943068"}
-signal-sema-storage={git="https://github.com/LiGoldragon/signal-sema-storage.git",rev="17d90e2a08cd926b4e4096cb48386542036e25a7"}
+signal-sema-storage={git="https://github.com/LiGoldragon/signal-sema-storage.git",rev="bd6cd6c4f2f020ad04427fc8ca86ca22d9cf4e6c"}
 tokio={version="1",features=["macros","rt-multi-thread","net","io-util","sync","time"]}
 thiserror="2"
 [dev-dependencies]
