@@ -642,13 +642,14 @@ dependencies = [
 [[package]]
 name = "signal-sema-storage"
 version = "0.1.0"
-source = "git+https://github.com/LiGoldragon/signal-sema-storage.git?rev=1bd593f4040307bd4d1db76ee15aa67d00efe1e6#1bd593f4040307bd4d1db76ee15aa67d00efe1e6"
+source = "git+https://github.com/LiGoldragon/signal-sema-storage.git?rev=17d90e2a08cd926b4e4096cb48386542036e25a7#17d90e2a08cd926b4e4096cb48386542036e25a7"
 dependencies = [
- "blake3",
+ "content-identity",
  "core-logos",
  "core-schema",
  "name-table",
  "rkyv",
+ "signal-frame",
  "thiserror",
 ]
 
