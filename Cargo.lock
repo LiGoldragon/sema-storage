@@ -549,7 +549,7 @@ dependencies = [
 [[package]]
 name = "sema-engine"
 version = "0.10.1"
-source = "git+https://github.com/LiGoldragon/sema-engine.git?rev=8338bca0d7ea2717e02efa23ff4a77bb791075ec#8338bca0d7ea2717e02efa23ff4a77bb791075ec"
+source = "git+https://github.com/LiGoldragon/sema-engine.git?rev=93a6b5f063292e000a7bf395fdd5b46e3e943068#93a6b5f063292e000a7bf395fdd5b46e3e943068"
 dependencies = [
  "blake3",
  "rkyv",
@@ -612,7 +612,7 @@ checksum = "f8fadd59c855ef2080decdef8ff161eb6661b86933c9d82e5ba29dc602a55aba"
 [[package]]
 name = "signal-frame"
 version = "0.3.0"
-source = "git+https://github.com/LiGoldragon/signal-frame.git?rev=d202e20d2171084e1425696e452686862945f7fb#d202e20d2171084e1425696e452686862945f7fb"
+source = "git+https://github.com/LiGoldragon/signal-frame.git?rev=f46872e7e8edae5264c892443d415a273b231234#f46872e7e8edae5264c892443d415a273b231234"
 dependencies = [
  "paste",
  "rkyv",
@@ -623,7 +623,7 @@ dependencies = [
 [[package]]
 name = "signal-frame-macros"
 version = "0.1.1"
-source = "git+https://github.com/LiGoldragon/signal-frame.git?rev=d202e20d2171084e1425696e452686862945f7fb#d202e20d2171084e1425696e452686862945f7fb"
+source = "git+https://github.com/LiGoldragon/signal-frame.git?rev=f46872e7e8edae5264c892443d415a273b231234#f46872e7e8edae5264c892443d415a273b231234"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -633,7 +633,7 @@ dependencies = [
 [[package]]
 name = "signal-sema"
 version = "0.2.0"
-source = "git+https://github.com/LiGoldragon/signal-sema.git?rev=924832cdb529db3348dd93e09457a385fd57efd8#924832cdb529db3348dd93e09457a385fd57efd8"
+source = "git+https://github.com/LiGoldragon/signal-sema.git?rev=4f3a24e6677ab9d200672851016c4c760c1e36e8#4f3a24e6677ab9d200672851016c4c760c1e36e8"
 dependencies = [
  "rkyv",
  "thiserror",
