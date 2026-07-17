@@ -115,7 +115,7 @@ dependencies = [
 [[package]]
 name = "core-schema"
 version = "0.1.0"
-source = "git+https://github.com/LiGoldragon/core-schema.git?rev=b08351167283257a4b2a4d52048d77b42e3a79c7#b08351167283257a4b2a4d52048d77b42e3a79c7"
+source = "git+https://github.com/LiGoldragon/core-schema.git?rev=8507b6562d980a24dd8aada9e23f9ae7ef08920a#8507b6562d980a24dd8aada9e23f9ae7ef08920a"
 dependencies = [
  "content-identity",
  "name-table",
@@ -643,7 +643,7 @@ dependencies = [
 [[package]]
 name = "signal-sema-storage"
 version = "0.1.0"
-source = "git+https://github.com/LiGoldragon/signal-sema-storage.git?rev=69ce70f415f6320eefa691acf14c57f6752dff02#69ce70f415f6320eefa691acf14c57f6752dff02"
+source = "git+https://github.com/LiGoldragon/signal-sema-storage.git?rev=4bf4b840871f2f2f23709295f1d421922ab545bc#4bf4b840871f2f2f23709295f1d421922ab545bc"
 dependencies = [
  "content-identity",
  "core-logos",
