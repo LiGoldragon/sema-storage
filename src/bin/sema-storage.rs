@@ -1,6 +1,6 @@
 use std::{env, path::PathBuf};
 
-use sema_storage::Runtime;
+use sema_storage::{NegotiatedWire, Runtime};
 use signal_sema_storage::{
     DocumentKey, DocumentKind, DocumentPayload, FamilyDeclaration, FixtureScope, FrameMessage,
     NameTableBytes, Reply, Request, SemaStorageRoot, SlotIdentifier, Version, Wire,
@@ -159,7 +159,9 @@ impl FramedSocket {
         Ok(socket)
     }
 
-    async fn accept(stream: UnixStream) -> Result<Self, Box<dyn std::error::Error>> {
+    async fn accept(
+        stream: UnixStream,
+    ) -> Result<(Self, NegotiatedWire), Box<dyn std::error::Error>> {
         let mut socket = Self {
             stream,
             sequence: 0,
@@ -172,7 +174,7 @@ impl FramedSocket {
             .stream
             .write_all(&Wire::frame_handshake_reply(Wire::handshake_reply(peer))?)
             .await?;
-        Ok(socket)
+        Ok((socket, NegotiatedWire::new(peer)))
     }
 
     async fn request(&mut self, request: &Request) -> Result<(), Box<dyn std::error::Error>> {
@@ -222,12 +224,22 @@ async fn subscribe(socket: &PathBuf, request: Request) -> Result<(), Box<dyn std
 }
 
 async fn serve(stream: UnixStream, runtime: Runtime) -> Result<(), Box<dyn std::error::Error>> {
-    let mut socket = FramedSocket::accept(stream).await?;
+    let (mut socket, negotiated) = FramedSocket::accept(stream).await?;
     let FrameMessage::Request { exchange, payload } =
         Wire::decode_frame(&socket.read_frame().await?)?
     else {
         return Err("expected shared request frame".into());
     };
+    if let Some(rejection) = negotiated.request_rejection() {
+        socket
+            .stream
+            .write_all(&Wire::frame_reply(
+                exchange,
+                Wire::encode_reply(&Reply::Rejected(rejection))?,
+            )?)
+            .await?;
+        return Ok(());
+    }
     let request = rkyv::from_bytes::<Request, rkyv::rancor::Error>(&payload)?;
     let subscription_filter = match &request {
         Request::Subscribe { scope, kind } => Some((*scope, *kind)),

@@ -9,6 +9,7 @@ use sema_engine::{
     SchemaHash, SchemaVersion, TableDescriptor, TableName, TableReference, VersionedStoreName,
     VersioningPolicy,
 };
+use signal_frame::{ProtocolVersion, SIGNAL_FRAME_PROTOCOL_VERSION};
 use signal_sema_storage::{
     ChangeEvent, DocumentKey, DocumentKind, FixtureScope, IdentifierBlock, Rejection, Reply,
     Request, SlotSummary, Snapshot, StoredDocument, SubscriptionIdentifier, Version,
@@ -24,6 +25,34 @@ pub enum Error {
     Actor(String),
 }
 type Result<T> = std::result::Result<T, Error>;
+
+/// The shared-frame protocol version a connecting peer declared at handshake,
+/// paired with the daemon's authority to serve requests under it.
+///
+/// The daemon negotiates the `signal-frame` protocol version once per connection.
+/// Every later request on that connection is answerable only while the peer's
+/// version stays compatible with the daemon's own; an incompatible peer is
+/// answered with the typed [`Rejection::IncompatibleWireVersion`] rather than
+/// dispatched. This keeps the daemon's version surface enforced instead of merely
+/// declared.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct NegotiatedWire {
+    peer: ProtocolVersion,
+}
+impl NegotiatedWire {
+    pub fn new(peer: ProtocolVersion) -> Self {
+        Self { peer }
+    }
+    /// Whether the daemon's own wire version can serve this peer.
+    pub fn is_compatible(self) -> bool {
+        SIGNAL_FRAME_PROTOCOL_VERSION.accepts(self.peer)
+    }
+    /// The typed rejection to answer an incoming request with when the peer's wire
+    /// version is incompatible, or `None` when the daemon can serve it.
+    pub fn request_rejection(self) -> Option<Rejection> {
+        (!self.is_compatible()).then_some(Rejection::IncompatibleWireVersion)
+    }
+}
 
 #[derive(Archive, Serialize, Deserialize, Clone, Debug)]
 enum StorageRecord {

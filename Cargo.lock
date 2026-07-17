@@ -567,6 +567,7 @@ dependencies = [
  "name-table",
  "rkyv",
  "sema-engine",
+ "signal-frame",
  "signal-sema-storage",
  "tempfile",
  "thiserror",
