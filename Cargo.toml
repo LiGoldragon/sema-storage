@@ -17,7 +17,7 @@ name-table={git="https://github.com/LiGoldragon/name-table.git",rev="c3237f77c08
 rkyv={version="0.8",features=["bytecheck"]}
 sema-engine={git="https://github.com/LiGoldragon/sema-engine.git",rev="93a6b5f063292e000a7bf395fdd5b46e3e943068"}
 signal-frame={git="https://github.com/LiGoldragon/signal-frame.git",rev="f46872e7e8edae5264c892443d415a273b231234",default-features=false}
-signal-sema-storage={git="https://github.com/LiGoldragon/signal-sema-storage.git",rev="28aeafb2588ea01908b55b75c431e1aa0c238f6f"}
+signal-sema-storage={git="https://github.com/LiGoldragon/signal-sema-storage.git",rev="31ab48608a3c2eab0733dcb16a3351251a70789d"}
 tokio={version="1",features=["macros","rt-multi-thread","net","io-util","sync","time"]}
 thiserror="2"
 [dev-dependencies]
