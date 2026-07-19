@@ -1,5 +1,5 @@
 {
-  description = "core-nomos — the stringless Core of Nomos: macros as typed data lowering CoreSchema to CoreLogos, with the real generated Rust as the acceptance oracle";
+  description = "core-nomos — the stringless Core of Nomos: macros as typed data lowering EncodedSchema to EncodedLogos, with the real generated Rust as the acceptance oracle";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";

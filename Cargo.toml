@@ -1,6 +1,6 @@
 [package]
 name="sema-storage"
-version="0.1.0"
+version="0.2.0"
 edition="2024"
 rust-version="1.89"
 license="MIT OR Apache-2.0"
@@ -13,11 +13,11 @@ name="sema-storage"
 path="src/bin/sema-storage.rs"
 [dependencies]
 kameo={git="https://github.com/LiGoldragon/kameo.git",rev="f491b45d7dcb55e5837eddde3d5d7ca8ceaa9f01",default-features=false,features=["macros"]}
-name-table={git="https://github.com/LiGoldragon/protos.git",rev="7e60f60fbc144265cf5ac1ec238b87744967d4eb"}
+name-table={git="https://github.com/LiGoldragon/protos.git",rev="f12a80c85d9d27ac4432b86b7d3095e8387c6fa9"}
 rkyv={version="0.8",features=["bytecheck"]}
 sema-engine={git="https://github.com/LiGoldragon/sema-engine.git",rev="93a6b5f063292e000a7bf395fdd5b46e3e943068"}
 signal-frame={git="https://github.com/LiGoldragon/signal-frame.git",rev="f46872e7e8edae5264c892443d415a273b231234",default-features=false}
-signal-sema-storage={git="https://github.com/LiGoldragon/signal-sema-storage.git",rev="21c3ad78227ec847bda37cfa2494619cdf1b0b70"}
+signal-sema-storage={git="https://github.com/LiGoldragon/signal-sema-storage.git",rev="25ac4fd0abf5d58ab9fce1f10d58220b62bef902"}
 tokio={version="1",features=["macros","rt-multi-thread","net","io-util","sync","time"]}
 thiserror="2"
 [dev-dependencies]
