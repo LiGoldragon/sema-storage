@@ -73,7 +73,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
         "store-sema-family" => {
             let scope = FixtureScope(parse(&mut arguments, "scope")?);
             let slot = SlotIdentifier(parse(&mut arguments, "slot")?);
-            let family = name_table::Identifier::new(parse(&mut arguments, "family id")?);
+            let family = name_table::Identifier::Fixture(parse(&mut arguments, "family id")?);
             let layout_version = parse(&mut arguments, "layout version")?;
             Request::Store {
                 key: DocumentKey {

@@ -1,5 +1,5 @@
 {
-  description = "core-nomos — the stringless Core of Nomos: macros as typed data lowering CoreSchema to CoreLogos, with the real generated Rust as the acceptance oracle";
+  description = "sema-storage — the central durable SEMA daemon for the language engine";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixpkgs-unstable";
@@ -36,7 +36,7 @@
           });
         };
         devShells.default = pkgs.mkShell {
-          name = "core-nomos";
+          name = "sema-storage";
           packages = [ pkgs.jujutsu toolchain ];
         };
       });
